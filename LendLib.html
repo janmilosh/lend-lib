@@ -3,8 +3,15 @@
 </head>
 
 <body>
-  <div id="categories-container">
-  	{{> categories}}
+	<div class="container">
+		<div id="lendlib">
+			<div id="categories-container">
+		  	{{> categories}}
+		  </div>
+			<div id="list">
+				{{> list}}
+			</div>
+		</div>
   </div>
 </body>
 
@@ -15,14 +22,38 @@
 			<div class="category">
 				<input type="text" id="add-category" value="">
 			</div>
-			{{else}}
-				<div class="category btn btn-inverse" id="btnNewCat">&plus;</div>
-			{{/if}}
+		{{else}}
+			<div class="category btn btn-inverse" id="btnNewCat">&plus;</div>
+		{{/if}}
 		{{#each lists}}
-			<button class="category btn btn-inverse">
+			<div class="category btn {{list_status}}" id="{{_id}}">
 				{{Category}}
-			</button>
+			</div>
 		{{/each}}
 	</div>
+</template>
+<template name="list">
+	<ul id="lending_list">
+		{{#each items}}
+			<li class="lending_item alert">
+				<button type="button" class="close delete_item" id="{{Name}}">x</button>
+				{{Name}}
+				{{#if lendee_editing}}
+					<input type="text" id="edit_lendee" class="col-md-2 pull-right" value="">
+				{{else}}
+					<div class="lendee pull-right label {{LendClass}}">
+						{{Lendee}}
+					</div>
+				{{/if}}
+			</li>
+		{{/each}}
+		{{#if list_selected}}
+			<li class="alert-success" id="btnAddItem">&plus;
+				{{#if list_adding}}
+					<input class="col-md-4" id="item_to_add" size="32" type="text">
+				{{/if}}
+			</li>
+		{{/if}}
+	</ul>
 </template>
 
