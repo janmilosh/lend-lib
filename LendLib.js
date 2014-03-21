@@ -49,11 +49,34 @@ if (Meteor.isClient) {
   //this function puts our cursor where it needs to be.
   function focusText(i) {
     i.focus();
+    i.value = val ? val: "";
     i.select();
   }
 
   function selectCategory(e, t) {
-    Session.set('current_list', this._id)
+    Session.set('current_list', this._id);
+  }
+
+  function addItem(list_id, item_name) {
+    if(!item_name && !list_id) return; // This was supposed to be && but that didn't seem right so made it ||
+    lists.update({_id: list_id}, {$addToSet: {items: {Name: item_name}}});
+  }
+
+  function removeItem(list_id, item_name) {
+    if (!item_name && !list_id) return; // This was supposed to be && but that didn't seem right so made it ||
+    lists.update({_id: list_id}, {$pull: {items: {Name: item_name}}});
+  }
+
+  function updateLendee(list_id, item_name, lendee_name) {
+    var l = lists.findOne({"_id": list_id, "items.Name": item_name});
+    if (l && l.items) {
+      for (var i = 0; i < l.items.length; i++) {
+        if (l.items[i].Name === item_name) {
+          l.items[i].LentTo = lendee_name;
+        }
+      }
+      lists.update({"_id": list_id},{$set: {"items": l.items}});
+    }
   }
 
   Template.list.items = function() {
