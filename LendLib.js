@@ -41,7 +41,8 @@ if (Meteor.isClient) {
     },
     'focusout #add-category': function(e, t) {
       Session.set('adding_category',false);
-    }
+    },
+    'click .category': selectCategory
   });
 
   /////Generic Helper Functions/////
@@ -49,6 +50,10 @@ if (Meteor.isClient) {
   function focusText(i) {
     i.focus();
     i.select();
+  }
+
+  function selectCategory(e, t) {
+    Session.set('current_list', this._id)
   }
 
   Template.list.items = function() {
@@ -86,6 +91,40 @@ if (Meteor.isClient) {
   Template.list.lendee_editing = function() {
     return (Session.equals('lendee_input', this.Name));
   };
+
+  Template.list.events({
+    'click #btnAddItem': function(e, t) {
+      Session.set('list_adding', true);
+      Meteor.flush();
+      focusText(t.find("item_to_add"));
+    },
+    'keyup #item_to_add': function(e, t) {
+      if (e.which === 13) {
+        addItem(Session.get('current_list'), e.target.value);
+        Session.set('list_adding', false);
+      }
+    },
+    'focusout #item_to_add': function(e, t) {
+      Session.set('list_adding', false);
+    },
+    'click .delete_item': function(e, t) {
+      removeItem(Session.get('current_list'), e.target.id);
+    },
+    'click .lendee': function(e, t) {
+      Session.set('lendee_input', this.Name);
+      Meteor.flush();
+      focusText(t.find("#edit_lendee"), this.LentTo);
+    },
+    'keyup #edit_lendee': function(e, t) {
+      if(e.which === 13) {
+        updateLendee(Session.get('current_list'), this.Name, e.target.value);
+        Session.set('lendee_input', null);
+      }
+      if (e.which === 27) {
+        Session.set('lendee_input', null);
+      }
+    }
+  });
 }
 
 if (Meteor.isServer) {
